@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watchlist n Rating</title>
+    <style>
+        :root {
+            --blue:#4F5D75;
+}
+
+body {
+    background-color: var(--blue);
+    color: var(--floral-white);
+}
+
+header, .button-primary {
+    background-color: var(--space-cadet);
+    color: var(--floral-white);
+}
+
+.footer {
+    background-color: var(--space-cadet);
+    color: var(--sunset);
+}
+
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('https://source.unsplash.com/random/1920x1080/?gradient');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.6;
+        }
+
+        .container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        .nav-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .nav-button:hover, .nav-button.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-container {
+            margin: 20px 0;
+        }
+
+
+        .drama-card {
+            background-color:var(--blue);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drama-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .drama-poster {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .drama-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drama-title {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 600;
+        }
+
+        .drama-meta {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            color: #FFD700;
+            margin-right: 5px;
+        }
+
+        .drama-actions {
+            margin-top: auto;
+        }
+
+        .add-button, .edit-button, .delete-button {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .add-button:hover, .edit-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .delete-button {
+            background-color: rgba(255, 0, 0, 0.5);
+            margin-top: 5px;
+        }
+
+        .delete-button:hover {
+            background-color: rgba(255, 0, 0, 0.75);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background-color: rgba(30, 30, 30, 0.9);
+            margin: 10% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1rem;
+        }
+
+        .form-input, .status-select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1rem;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        #dramaList, #myDramaList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .synopsis-modal {
+            display: none;
+            position: fixed;
+            z-index: 2001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        .synopsis-content {
+            background-color: rgba(30, 30, 30, 0.9);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .synopsis-content h2 {
+            margin-bottom: 10px;
+        }
+
+        .synopsis-content p {
+            margin-bottom: 15px;
+        }
+
+        .synopsis-content .drama-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .synopsis-content .drama-details span {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .close-synopsis {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-synopsis:hover,
+        .close-synopsis:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            #dramaList, #myDramaList {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+.search-sort-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+
+
+
+#searchInput, #myListsearchInput {
+    flex: 1; 
+    padding: 12px 15px;
+    border: none;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1rem;
+}
+
+
+#sortExploreOptions, #sortMyListOptions {
+    width: 150px; /* Set width to keep it smaller */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 25px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.9rem;
+    appearance: none;
+}
+
+/* Hover effect */
+#sortExploreOptions:hover, #searchInput:hover, #sortExploreOptions:hover, #sortMyListOptions:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.search-container {
+    display: flex;
+    gap: 10px; 
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+.episode-count {
+    margin-left: 15px; 
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <nav class="navigation">
+                <button id="exploreButton" class="nav-button active">Explore</button>
+                <button id="myListButton" class="nav-button">My List</button>
+            </nav>
+        </header>
+
+        <div class="content">
+            <div id="explorePage">
+                <div class="search-sort-container">
+                    <input type="text" id="searchInput" placeholder="Search dramas...">
+                    <select id="sortExploreOptions">
+                        <option value="nameAsc">Name (A-Z)</option>
+                        <option value="nameDesc">Name (Z-A)</option>
+                        <option value="yearAsc">Year (Oldest)</option>
+                        <option value="yearDesc">Year (Newest)</option>
+                    </select>
+                </div>
+                <div id="dramaList"></div>
+            </div>
+            
+
+            <div id="myListPage" style="display: none;">
+                <div class="search-container">
+                   <input type="text" id="myListsearchInput" placeholder="Search dramas...">
+                    <select id="sortMyListOptions">
+                        <option value="nameAsc">Name (A-Z)</option>
+                        <option value="nameDesc">Name (Z-A)</option>
+                        <option value="yearAsc">Year (Oldest)</option>
+                        <option value="yearDesc">Year (Newest)</option>
+                    </select>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" data-status="watching">Watching</button>
+                    <button class="tab" data-status="completed">Completed</button>
+                    <button class="tab" data-status="plan">Plan to Watch</button>
+                </div>
+                <div id="myDramaList"></div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Add/Edit Drama Modal -->
+    <div id="dramaModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add to My List</h2>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" class="status-select">
+                    <option value="watching">Currently Watching</option>
+                    <option value="completed">Completed</option>
+                    <option value="plan">Plan to Watch</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="currentEpisode">Current Episode:</label>
+                <input id="currentEpisode" type="number" class="form-input" min="0">
+            </div>
+            <div class="form-group">
+                <label for="totalEpisodes">Total Episodes:</label>
+                <input id="totalEpisodes" type="number" class="form-input" min="1">
+            </div>
+            <div class="form-group">
+                <label for="rating">Your Rating:</label>
+                <input id="rating" type="number" class="form-input" min="1" max="10" step="0.1">
+            </div>
+            <button id="saveButton" class="save-button">Save</button>
+        </div>
+    </div>
+
+    <div id="synopsisModal" class="synopsis-modal">
+        <div class="synopsis-content">
+            <span class="close-synopsis">&times;</span>
+            <div id="synopsisContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let dramas = [
+            {
+                id: 1,
+                title: "Crash Landing on You",
+                year: "2019",
+                type: "Korean Drama",
+                rating: 8.7,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/fa/cf/fd/facffd892be28a9ce217b16e6107952e.jpg",
+                synopsis: "A wealthy South Korean heiress accidentally finds herself in North Korea and falls in love with a North Korean military officer.",
+            },
+            {
+                id: 2,
+                title: "Goblin",
+                year: "2016",
+                type: "Korean Drama",
+                rating: 8.6,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/c4/87/8e/c4878ed44c5714fd01af97340072468e.jpg",
+                synopsis: "A modern fantasy about a long-lived goblin who needs to find a human bride to end his immortal life.",
+            },
+            {
+                id: 3,
+                title: "Itaewon Class",
+                year: "2020",
+                type: "Korean Drama",
+                rating: 8.2,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/20/e5/f6/20e5f6c0b510b78346ee5a3ec1c17588.jpg",
+                synopsis: "An ex-convict opens a street bar in Itaewon and strives for success against all odds.",
+            },
+            {
+                id: 4,
+                title: "Descendants of the Sun",
+                year: "2016",
+                type: "Korean Drama",
+                rating: 8.3,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/01/ec/8c/01ec8cbfbd5620b77b8ebcee2705a80b.jpg",
+                synopsis: "A love story between a special forces captain and a surgeon set in a fictional war-torn country.",
+            },
+            {
+                id: 5,
+                
+                title: "My Love from the Star",
+                year: "2013",
+                type: "Korean Drama",
+                rating: 8.3,
+                totalEp: 21,
+                poster: "https://i.pinimg.com/736x/e7/4b/45/e74b4530d5f5b93d3f9ccfa7c0a0df68.jpg",
+                synopsis: "An alien who landed on Earth 400 years ago falls in love with a top actress in modern-day Korea.",
+            },
+            {
+                id: 6,
+                
+                title: "Mouse",
+                year: "2021",
+                type: "Korean Drama",
+                rating: 9,
+                totalEp: 20,
+                poster: "https://i.pinimg.com/564x/41/a2/c0/41a2c05cea28377717bd36cfd1013dae.jpg",
+                synopsis: "<b>Mouse</b> (2021) is a South Korean thriller about rookie cop Jung Ba-reum, whose life changes after an encounter with a notorious serial killer. The series explores psychopathy, questioning if violent tendencies can be detected before birth, and delves into the complexities of human nature and morality with unexpected twists.",
+            },
+            {
+                id: 7,
+                
+                title: "Squid Game",
+                year: "2021",
+                type: "Korean Drama",
+                rating: 9,
+                totalEp: 9,
+                poster: "https://i.pinimg.com/564x/23/cc/bf/23ccbf28137082dc795cf308f74f5ec0.jpg",
+                synopsis: "After a failed business venture, the debt-ridden chauffeur Seong Gi Hun lives his life gambling away the money he mooches off his elderly mother while failing to provide for her and his estranged daughter. When his life finally hits rock bottom, he receives an irresistible offer promising him a ₩45.6 billion prize in exchange for winning traditional Korean children's games against 455 other players, among them his childhood friend Cho Sang Woo. Commencing the games, the participants soon learn of the deadly consequences that come with losing.",
+            },
+            {
+                id: 8,
+                
+                title: "Signal",
+                year: "2016",
+                type: "Korean Drama",
+                rating: 8.7,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/71/94/47/719447a75b06a20b8e5222e47a78f4c0.jpg",
+                synopsis: "Signal is a Korean drama that tells the story of a group of detectives who use a mysterious walkie-talkie to solve cold cases",
+            },
+            {
+                id: 9,
+                
+                title: "Sky Castle",
+                year: "2018",
+                type: "Korean Drama",
+                rating: 8.8,
+                totalEp: 20,
+                poster: "https://i.pinimg.com/564x/64/23/47/642347dfabb8eb100e8c48e75fc5ccfe.jpg",
+                synopsis: "Sky Castle is a satirical Korean drama that tells the life of high-class housewives who live in a luxury housing estate called Sky Castle. These housewives are ambitious to help their husbands become successful and raise their children like royalty.",
+            },
+            {
+                id: 10,
+                title: "Daily Dose of Sunshine",
+                year: "2023",
+                type: "Korean Drama",
+                rating: 8.8,
+                totalEp: 12,
+                poster: "https://i.pinimg.com/736x/8a/03/cd/8a03cd7454bc81480126114b599ba93a.jpg",
+                synopsis: "A kind-hearted nurse who works in a psychiatric ward all-out tries to be a glimmer of hope for her patients, even though the challenges continue to come.",
+            },
+            {
+                id: 11,
+                
+                title: "Voice",
+                year: "2017",
+                type: "Korean Drama",
+                rating: 8.7,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/45/d4/dd/45d4dd71ccac62e881beb5f2ee9a11d7.jpg",
+                synopsis: "Popular detective Moo Jin-hyuk and Kang Kwon-joo who work together to pursue a serial killer",
+            },
+            {
+                id: 12,
+                
+                title: "Summer Strike",
+                year: "2022",
+                type: "Korean Drama",
+                rating: 8.8,
+                totalEp: 12,
+                poster: "https://i.pinimg.com/564x/fb/f1/03/fbf1032fa175f9a3374e563fc924d151.jpg",
+                synopsis: "After being fed up with her life in a big city, a young woman goes to a remote town where she meets a local librarian who is also looking for an escape",
+            },
+            {
+                id: 13,
+                title: "My Mister",
+                year: "2018",
+                type: "Korean Drama",
+                rating: 8.8,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/f9/1d/c7/f91dc7f2d8d6b84fcfb0c6ec80b63171.jpg",
+                synopsis: "Tells the story of two people from different backgrounds who find each other's warmth and comfort",
+            },
+            {
+                id: 14,
+                title: "The Judge From Hell",
+                year: "2024",
+                type: "Korean Drama",
+                rating: 8.7,
+                totalEp: 14,
+                poster: "https://i.pinimg.com/736x/a5/66/69/a56669eaac6a0d29792ea854fa759bd8.jpg",
+                synopsis: "Tells the story of a judge who is possessed by the devil and must complete his mission",
+            },
+            {
+                id: 15,
+                title: "The Devil Judge",
+                year: "2021",
+                type: "Korean Drama",
+                rating: 8.9,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/dc/07/fd/dc07fd900051a680a4967b7aec04f10a.jpg",
+                synopsis: "A presiding judge who was nicknamed <b>The Devil's Judge<b> for punishing criminals mercilessly",
+            },
+            {
+                id: 16,
+                title: "Weak Hero Class 1",
+                year: "2022",
+                type: "Korean Drama",
+                rating: 9.1,
+                totalEp: 8,
+                poster: "https://i.pinimg.com/564x/eb/21/7a/eb217a323aa3e774b02a0a6a15c1ffc8.jpg",
+                synopsis: " a top student who uses his smarts and the people around him to fight against bullying and violence in high school",
+            },
+            {
+                id: 17,
+                title: "Taxi Driver",
+                year: "2021",
+                type: "Korean Drama",
+                rating: 8.8,
+                totalEp: 16,
+                poster: "https://i.pinimg.com/564x/e7/cc/12/e7cc1235161c1fceedaafe6f92bd0c21.jpg",
+                synopsis: "a taxi driver who works for a secret organization that seeks revenge for victims of crimes that went unpunished",
+            },
+            {
+                id: 18,
+                title: "Extracurricular",
+                year: "2020",
+                type: "Korean Drama",
+                rating: 8.3,
+                totalEp: 10,
+                poster: "https://i.pinimg.com/564x/02/0a/c2/020ac20ab8a2969d393665253dc5c595.jpg",
+                synopsis: "a high school student who becomes involved in serious crime",
+            },
+            {
+                id: 19,
+                title: "Kill It",
+                year: "2019",
+                type: "Korean Drama",
+                rating: 8.2,
+                totalEp: 12,
+                poster: "https://i.pinimg.com/564x/1d/75/d4/1d75d4530a4dac548bcdc8fbefc7b10d.jpg",
+                synopsis: " a detective and a veterinarian who were connected by fate and set out to solve a serial murder",
+            },
+            {
+                id: 20,
+                title: "Awaken",
+                year: "2020",
+                type: "Korean Drama",
+                rating: 8.2,
+                totalEp: 12,
+                poster: "https://i.pinimg.com/736x/9d/aa/83/9daa83a1455b737890566cf51ede95c5.jpg",
+                synopsis: " a series of murders that are connected to a tragic event from 28 years ago",
+            },
+            {
+    id: 21,
+    title: "Save Me",
+    year: "2017",
+    type: "Korean Drama",
+    rating: 8.1,
+    totalEp: 16,
+    poster: "https://i.pinimg.com/564x/f2/43/14/f24314577e08de5f65989399f872af88.jpg",
+    synopsis: "A psychological thriller about a girl trapped in a religious cult and her struggle to escape.",
+},
+{
+    id: 22,
+    title: "Vincenzo",
+    year: "2021",
+    type: "Korean Drama",
+    rating: 8.9,
+    totalEp: 20,
+    poster: "https://i.pinimg.com/736x/86/e7/be/86e7be6828a1bb3003391e94b9681fcb.jpg",
+    synopsis: "A Korean-Italian lawyer returns to Korea and delivers justice with mafia tactics.",
+},
+{
+    id: 23,
+    title: "Happiness",
+    year: "2021",
+    type: "Korean Drama",
+    rating: 8.5,
+    totalEp: 12,
+    poster: "https://i.pinimg.com/736x/c6/61/7f/c6617f39369f22bc7463b3f777a22cc0.jpg",
+    synopsis: "A thriller set in a high-rise apartment during a deadly viral outbreak.",
+},
+{
+    id: 24,
+    title: "Twinkling Watermelon",
+    year: "2023",
+    type: "Korean Drama",
+    rating: 8.3,
+    totalEp: 16,
+    poster: "https://i.pinimg.com/564x/d1/c5/b5/d1c5b56ffec441c85ca49e38fcaa95b8.jpg",
+    synopsis: "A time-travel story about a high school band and the bonds they form.",
+},
+{
+    id: 25,
+    title: "The 8 Show",
+    year: "2024",
+    type: "Korean Drama",
+    rating: 8.7,
+    totalEp: 8,
+    poster: "https://i.pinimg.com/736x/55/69/79/556979fdd638914ab0571ef98d28e990.jpg",
+    synopsis: "A unique drama following eight individuals' intertwined lives.",
+},
+   
+    {
+        id: 26,
+        title: "The Call",
+        year: "2020",
+        type: "Korean Movie",
+        rating: 7.9,
+        totalEp: 1,
+        poster: "https://i.pinimg.com/736x/e4/c7/ab/e4c7abbec7ae92ee29ab263d6dcbfa4a.jpg",
+        synopsis: "A suspense thriller where two women living in different times are connected by a phone call that changes their fates.",
+    },
+    {
+        id: 27,
+        title: "Train to Busan",
+        year: "2016",
+        type: "Korean Movie",
+        rating: 8.5,
+        totalEp: 1,
+        poster: "https://i.pinimg.com/564x/96/86/5c/96865c6ca66be155c2855960a65515b7.jpg",
+        synopsis: "A father and daughter are trapped on a speeding train during a zombie outbreak in South Korea.",
+    },
+    {
+        id: 28,
+        title: "Parasite",
+        year: "2019",
+        type: "Korean Movie",
+        rating: 8.6,
+        totalEp: 1,
+        poster:  "https://i.pinimg.com/564x/bc/e3/c2/bce3c2cbd502d88d137200ee7d928f09.jpg",
+        synopsis: "A dark comedy about the impoverished Kim family scheming to infiltrate the wealthy Park family's household.",
+    },
+    {
+        id: 29,
+        title: "Exit",
+        year: "2019",
+        type: "Korean Movie",
+        rating: 7.1,
+        totalEp: 1,
+        poster: "https://i.pinimg.com/736x/31/ec/3c/31ec3cb25731b197d84e75958c1a9124.jpg",
+        synopsis: "A man uses his rock climbing skills to save people trapped in a building filled with toxic gas.",
+    },
+    {
+        id: 30,
+        title: "The Fiery Priest",
+        year: "2019",
+        type: "Korean Drama",
+        rating: 8.4,
+        totalEp: 20,
+        poster: "https://i.pinimg.com/564x/37/ff/b8/37ffb86ad63947e5fdc6ea3c05f4d785.jpg",
+        synopsis: "A Catholic priest with anger issues joins forces with a detective to solve a murder case.",
+    },
+
+
+
+
+
+        ];
+        let myList = [];
+        let currentDramaId = null;
+        let isEditing = false;
+
+        function createDramaCard(drama, inMyList = false) {
+            return `
+                <div class="drama-card" data-id="${drama.id}">
+                    <img src="${drama.poster}" alt="${drama.title}" class="drama-poster">
+                    <div class="drama-info">
+                        <h2 class="drama-title">${drama.title}</h2>
+                        <div class="drama-meta">${drama.type} • ${drama.year}</div>
+                        <div class="rating">
+                            <span class="star">★</span>${drama.rating.toFixed(1)}
+                            ${inMyList ? `<span class="episode-count">${drama.currentEp}/${drama.totalEp}</span>` : ''}
+                        </div>
+                        <div class="drama-actions">
+                            ${inMyList 
+                                ? `
+                                <button class="edit-button" onclick="event.stopPropagation(); openDramaModal(${drama.id}, true)">Edit</button>
+                                <button class="delete-button" onclick="event.stopPropagation(); deleteDrama(${drama.id})">Delete</button>
+                                `
+                                : `<button class="add-button" onclick="event.stopPropagation(); openDramaModal(${drama.id})">Add to My List</button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateExploreList() {
+            const dramaList = document.getElementById('dramaList');
+            dramaList.innerHTML = '';
+            dramas.forEach(drama => {
+                dramaList.innerHTML += createDramaCard(drama);
+            });
+        }
+
+        function updateMyList() {
+            const myDramaList = document.getElementById('myDramaList');
+            const activeTab = document.querySelector('.tab.active');
+            const currentStatus = activeTab ? activeTab.dataset.status : 'watching';
+
+            myDramaList.innerHTML = '';
+            myList.filter(drama => drama.status === currentStatus).forEach(drama => {
+                myDramaList.innerHTML += createDramaCard(drama, true);
+            });
+        }
+
+
+    function openDramaModal(dramaId, edit = false) {
+    const isInMyList = myList.some(d => d.id === dramaId);
+    currentDramaId = dramaId;
+    isEditing = edit || isInMyList; 
+    const drama = isEditing ? myList.find(d => d.id === dramaId) : dramas.find(d => d.id === dramaId);
+    
+    document.getElementById('modalTitle').textContent = isEditing ? 'Edit Drama' : 'Add to My List';
+    document.getElementById('status').value = isEditing ? drama.status : 'watching';
+    document.getElementById('currentEpisode').value = isEditing ? drama.currentEp : 0;
+    document.getElementById('totalEpisodes').value = drama.totalEp;
+    document.getElementById('rating').value = isEditing ? drama.rating : '';
+
+    const currentEpisodeInput = document.getElementById('currentEpisode');
+    const totalEpisodes = parseInt(document.getElementById('totalEpisodes').value) || 0;
+    currentEpisodeInput.max = totalEpisodes;
+
+    const statusSelect = document.getElementById('status');
+    function handleStatusChange() {
+        if (statusSelect.value === 'completed') {
+            currentEpisodeInput.value = totalEpisodes; 
+        }
+    }
+    statusSelect.addEventListener('change', handleStatusChange);
+
+    document.getElementById('dramaModal').style.display = 'block';
+
+    document.querySelector('.close').addEventListener('click', function() {
+        document.getElementById('dramaModal').style.display = 'none';
+        statusSelect.removeEventListener('change', handleStatusChange);
+    });
+}
+
+
+
+
+        function closeDramaModal() {
+            document.getElementById('dramaModal').style.display = 'none';
+        }
+
+        function saveDrama() {
+            const status = document.getElementById('status').value;
+            const currentEp = parseInt(document.getElementById('currentEpisode').value) || 0;
+            const totalEp = parseInt(document.getElementById('totalEpisodes').value);
+            const rating = Math.min(parseFloat(document.getElementById('rating').value) || 0, 10);
+
+            if (isEditing) {
+                const index = myList.findIndex(d => d.id === currentDramaId);
+                if (index !== -1) {
+                    myList[index] = { ...myList[index], status, currentEp, totalEp, rating };
+                }
+            } else {
+                const drama = dramas.find(d => d.id === currentDramaId);
+                if (drama) {
+                    myList.push({ ...drama, status, currentEp, totalEp, rating });
+                }
+            }
+
+            updateMyList();
+            closeDramaModal();
+        }
+
+        function showSynopsis(dramaId) {
+            const drama = dramas.find(d => d.id === dramaId) || myList.find(d => d.id === dramaId);
+            if (drama) {
+                const synopsisModal = document.getElementById('synopsisModal');
+                const synopsisContent = document.getElementById('synopsisContent');
+                synopsisContent.innerHTML = `
+                    <h2>${drama.title}</h2>
+                    <div class="drama-details">
+                        <span>${drama.type}</span>
+                        <span>${drama.year}</span>
+                        <span>★ ${drama.rating.toFixed(1)}</span>
+                        <span>${drama.totalEp} episodes</span>
+                    </div>
+                    <p>${drama.synopsis}</p>
+                    ${drama.currentEp !== undefined ? `<p>Current progress: ${drama.currentEp}/${drama.totalEp} episodes</p>` : ''}
+                `;
+                synopsisModal.style.display = 'block';
+            }
+        }
+
+        function deleteDrama(dramaId) {
+
+    const drama = myList.find(d => d.id === dramaId);
+    
+
+    const confirmDelete = confirm(`Are you sure you want to delete "${drama.title}" from your list?`);
+    
+    if (confirmDelete) {
+
+        const index = myList.findIndex(d => d.id === dramaId);
+        if (index !== -1) {
+            myList.splice(index, 1); 
+            updateMyList();
+        }
+    }
+}
+
+
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const dramaCards = document.querySelectorAll('#dramaList .drama-card');
+            dramaCards.forEach(card => {
+                const title = card.querySelector('.drama-title').textContent.toLowerCase();
+                const year = card.querySelector('.drama-meta').textContent.split('•')[1].trim();
+                if (title.includes(searchTerm) || year.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        document.getElementById('sortMyListOptions').addEventListener('change', function(e) {
+    const sortValue = e.target.value;
+    sortDramas(sortValue, 'myList');
+});
+
+        document.getElementById('myListsearchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const myDramaCards = document.querySelectorAll('#myDramaList .drama-card');
+    myDramaCards.forEach(card => {
+        const title = card.querySelector('.drama-title').textContent.toLowerCase();
+        const year = card.querySelector('.drama-meta').textContent.split('•')[1].trim();
+        if (title.includes(searchTerm) || year.includes(searchTerm)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Tambahkan event listener untuk dropdown sorting di Explore page
+document.getElementById('sortExploreOptions').addEventListener('change', function(e) {
+    const sortValue = e.target.value;
+    sortDramas(sortValue, 'explore');
+});
+
+// Fungsi untuk sorting drama
+function sortDramas(sortValue, page) {
+    let dramasToSort = page === 'explore' ? [...dramas] : [...myList];
+    
+    switch(sortValue) {
+        case 'nameAsc':
+            dramasToSort.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+        case 'nameDesc':
+            dramasToSort.sort((a, b) => b.title.localeCompare(a.title));
+            break;
+        case 'yearAsc':
+            dramasToSort.sort((a, b) => parseInt(a.year) - parseInt(b.year));
+            break;
+        case 'yearDesc':
+            dramasToSort.sort((a, b) => parseInt(b.year) - parseInt(a.year));
+            break;
+    }
+
+    // Update tampilan sesuai dengan halaman yang aktif
+    if (page === 'explore') {
+        const dramaList = document.getElementById('dramaList');
+        dramaList.innerHTML = '';
+        dramasToSort.forEach(drama => {
+            dramaList.innerHTML += createDramaCard(drama);
+        });
+    } else {
+        const myDramaList = document.getElementById('myDramaList');
+        myDramaList.innerHTML = '';
+        const activeTab = document.querySelector('.tab.active');
+        const currentStatus = activeTab ? activeTab.dataset.status : 'watching';
+        
+        dramasToSort
+            .filter(drama => drama.status === currentStatus)
+            .forEach(drama => {
+                myDramaList.innerHTML += createDramaCard(drama, true);
+            });
+    }
+}
+
+// Modifikasi HTML untuk menambahkan dropdown sorting di My List page
+// Tambahkan ini di dalam div dengan class "search-container" di My List page
+
+        document.getElementById('exploreButton').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('myListButton').classList.remove('active');
+            document.getElementById('explorePage').style.display = 'block';
+            document.getElementById('myListPage').style.display = 'none';
+        });
+
+        document.getElementById('myListButton').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('exploreButton').classList.remove('active');
+            document.getElementById('explorePage').style.display = 'none';
+            document.getElementById('myListPage').style.display = 'block';
+        });
+
+        document.querySelector('.close').addEventListener('click', closeDramaModal);
+        document.getElementById('saveButton').addEventListener('click', saveDrama);
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.drama-card')) {
+                const dramaId = parseInt(e.target.closest('.drama-card').dataset.id);
+                showSynopsis(dramaId);
+            }
+        });
+
+        document.querySelector('.close-synopsis').addEventListener('click', function() {
+            document.getElementById('synopsisModal').style.display = 'none';
+        });
+
+        window.addEventListener('click', function(e) {
+            if (e.target == document.getElementById('synopsisModal')) {
+                document.getElementById('synopsisModal').style.display = 'none';
+            }
+        });
+
+        let lastScrollTop = 0;
+        document.querySelector('.container').addEventListener('scroll', function() {
+            const st = this.scrollTop;
+            if (st > lastScrollTop) {
+                document.querySelector('.header').classList.add('hidden');
+            } else {
+                document.querySelector('.header').classList.remove('hidden');
+            }
+            lastScrollTop = st <= 0 ? 0 : st;
+        }, false);
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                updateMyList();
+            });
+        });
+
+        // Initialize
+        updateExploreList();
+        updateMyList();
+    </script>
+</body>
+</html>
